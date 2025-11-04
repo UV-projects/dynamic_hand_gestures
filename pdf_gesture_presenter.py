@@ -92,7 +92,7 @@ class PDFGesturePresenter:
         # Instructions label
         instructions = tk.Label(
             menu_frame,
-            text="Gestures: Swipe Left→Right (Previous) | Swipe Right→Left (Next)",
+            text="Gestures: Fast Swipe UP (Previous) | Fast Swipe DOWN (Next)",
             bg='#2c3e50',
             fg='#ecf0f1',
             font=('Arial', 10)
@@ -308,21 +308,25 @@ class PDFGesturePresenter:
                     # Check if enough time has passed since last gesture
                     if current_time - self.last_gesture_time > self.gesture_cooldown:
 
-                        # Swipe from right to left = Next slide
-                        if action in [Event.SWIPE_LEFT, Event.SWIPE_LEFT2, Event.SWIPE_LEFT3]:
+                        # Fast swipe down = Next slide
+                        if action == Event.FAST_SWIPE_DOWN:
                             print(f"Gesture detected: Next Slide (Action: {action.name})")
                             self.next_page()
                             self.last_gesture_time = current_time
                             self.drawer.set_action(action)
 
-                        # Swipe from left to right = Previous slide
-                        elif action in [Event.SWIPE_RIGHT, Event.SWIPE_RIGHT2, Event.SWIPE_RIGHT3]:
+                        # Fast swipe up = Previous slide
+                        elif action == Event.FAST_SWIPE_UP:
                             print(f"Gesture detected: Previous Slide (Action: {action.name})")
                             self.previous_page()
                             self.last_gesture_time = current_time
                             self.drawer.set_action(action)
 
                         # Handle other gestures for visual feedback
+                        elif action in [Event.SWIPE_LEFT, Event.SWIPE_LEFT2, Event.SWIPE_LEFT3]:
+                            self.drawer.set_action(action)
+                        elif action in [Event.SWIPE_RIGHT, Event.SWIPE_RIGHT2, Event.SWIPE_RIGHT3]:
+                            self.drawer.set_action(action)
                         elif action in [Event.SWIPE_UP, Event.SWIPE_UP2, Event.SWIPE_UP3]:
                             self.drawer.set_action(action)
                         elif action in [Event.SWIPE_DOWN, Event.SWIPE_DOWN2, Event.SWIPE_DOWN3]:
@@ -331,11 +335,11 @@ class PDFGesturePresenter:
                             self.drawer.set_action(action)
                         elif action in [Event.DROP, Event.DROP2, Event.DROP3]:
                             self.drawer.set_action(action)
-                        elif action in [Event.FAST_SWIPE_DOWN, Event.FAST_SWIPE_UP, Event.ZOOM_IN, Event.ZOOM_OUT, Event.DOUBLE_TAP, Event.TAP]:
+                        elif action in [Event.ZOOM_IN, Event.ZOOM_OUT, Event.DOUBLE_TAP, Event.TAP]:
                             self.drawer.set_action(action)
                     else:
                         # Still in cooldown, but acknowledge the gesture was detected
-                        if action in [Event.SWIPE_LEFT, Event.SWIPE_LEFT2, Event.SWIPE_LEFT3, Event.SWIPE_RIGHT, Event.SWIPE_RIGHT2, Event.SWIPE_RIGHT3]:
+                        if action in [Event.FAST_SWIPE_UP, Event.FAST_SWIPE_DOWN]:
                             print(f"Gesture detected but in cooldown period ({self.gesture_cooldown - (current_time - self.last_gesture_time):.1f}s remaining)")
 
                     # Clear the action after processing

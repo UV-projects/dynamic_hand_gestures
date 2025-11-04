@@ -38,10 +38,12 @@ def run_diagnostics(args):
 
     frame_count = 0
     gesture_count = {
-        'SWIPE_LEFT': 0,
-        'SWIPE_RIGHT': 0,
+        'FAST_SWIPE_DOWN': 0,
+        'FAST_SWIPE_UP': 0,
         'SWIPE_UP': 0,
         'SWIPE_DOWN': 0,
+        'SWIPE_LEFT': 0,
+        'SWIPE_RIGHT': 0,
         'OTHER': 0
     }
 
@@ -109,16 +111,20 @@ def run_diagnostics(args):
                     print(f"    Time: {time.strftime('%H:%M:%S')}")
 
                     # Update counters
-                    if 'SWIPE_LEFT' in action_name:
-                        gesture_count['SWIPE_LEFT'] += 1
+                    if action_name == 'FAST_SWIPE_DOWN':
+                        gesture_count['FAST_SWIPE_DOWN'] += 1
                         print(f"    >>> THIS SHOULD TRIGGER: NEXT SLIDE <<<")
-                    elif 'SWIPE_RIGHT' in action_name:
-                        gesture_count['SWIPE_RIGHT'] += 1
+                    elif action_name == 'FAST_SWIPE_UP':
+                        gesture_count['FAST_SWIPE_UP'] += 1
                         print(f"    >>> THIS SHOULD TRIGGER: PREVIOUS SLIDE <<<")
                     elif 'SWIPE_UP' in action_name:
                         gesture_count['SWIPE_UP'] += 1
                     elif 'SWIPE_DOWN' in action_name:
                         gesture_count['SWIPE_DOWN'] += 1
+                    elif 'SWIPE_LEFT' in action_name:
+                        gesture_count['SWIPE_LEFT'] += 1
+                    elif 'SWIPE_RIGHT' in action_name:
+                        gesture_count['SWIPE_RIGHT'] += 1
                     else:
                         gesture_count['OTHER'] += 1
 
@@ -134,14 +140,16 @@ def run_diagnostics(args):
         frame = drawer.draw(frame)
 
         # Show gesture counts
-        count_y = frame.shape[0] - 120
+        count_y = frame.shape[0] - 150
         cv2.putText(frame, "Gesture Counts:", (10, count_y),
                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
-        cv2.putText(frame, f"LEFT (Next): {gesture_count['SWIPE_LEFT']}", (10, count_y + 30),
+        cv2.putText(frame, f"FAST DOWN (Next): {gesture_count['FAST_SWIPE_DOWN']}", (10, count_y + 30),
                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-        cv2.putText(frame, f"RIGHT (Prev): {gesture_count['SWIPE_RIGHT']}", (10, count_y + 60),
+        cv2.putText(frame, f"FAST UP (Prev): {gesture_count['FAST_SWIPE_UP']}", (10, count_y + 60),
                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-        cv2.putText(frame, f"Other: {gesture_count['OTHER']}", (10, count_y + 90),
+        cv2.putText(frame, f"Regular Swipes: {gesture_count['SWIPE_UP'] + gesture_count['SWIPE_DOWN'] + gesture_count['SWIPE_LEFT'] + gesture_count['SWIPE_RIGHT']}", (10, count_y + 90),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
+        cv2.putText(frame, f"Other: {gesture_count['OTHER']}", (10, count_y + 120),
                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
         # Display instructions
@@ -156,6 +164,9 @@ def run_diagnostics(args):
     # Show summary
     print("\n" + "="*60)
     print("DIAGNOSTIC SUMMARY")
+    print("="*60)
+    print(f"\nTotal frames processed: {frame_count}")
+    print(f"\nSlide Control Gestures:")
     print("="*60)
     print(f"\nTotal frames processed: {frame_count}")
     print(f"\nGesture detections:")
